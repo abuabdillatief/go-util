@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/abuabdillatief/util/pointer"
+	"github.com/abuabdillatief/go-util/pointer"
 )
 
 // ReadFileAsString will read the file at the given path and return its content as a string.
