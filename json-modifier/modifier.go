@@ -64,6 +64,30 @@ func TransformJSONFilesInDir[O, R any](dirPath, keyPath string, transformFn func
 	return nil
 }
 
+// TransformJSONFilesInDirIfFileCondition will modify the field at the given path in all the JSON files in the given directory using the transform function.
+// It returns an error if any.
+// keyPath is the path to the field to be modified.
+// example: "addresses.country"
+func TransformJSONFilesInDirIfFileCondition[O, R any](dirPath, keyPath string, transformFn func(O) R, shouldTransform func(filename string) bool) error {
+	files, err := files.GetFilesInDir(dirPath)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		if !shouldTransform(file) {
+			continue
+		}
+
+		err := TransformJSONFile[O, R](dirPath+"/"+file, keyPath, transformFn)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func updateFieldByPath[O, T any](data map[string]interface{}, path []string, transformFn func(O) T) {
 	if len(path) == 0 {
 		return
@@ -94,7 +118,7 @@ func updateFieldByPath[O, T any](data map[string]interface{}, path []string, tra
 		if value, ok := data[currKey].(O); ok {
 			data[currKey] = transformFn(value)
 		}
-		
+
 		return
 	}
 
